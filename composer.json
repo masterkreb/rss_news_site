@@ -1,0 +1,11 @@
+{
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "require": {
+        "php-feed-io/feed-io": "^6.1",
+        "symfony/http-client": "^7.3"
+    }
+}
