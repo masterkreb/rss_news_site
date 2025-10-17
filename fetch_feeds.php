@@ -212,6 +212,11 @@ foreach ($feeds as $feedData) {
                 if (strpos($imageUrl, '//') === 0) {
                     $imageUrl = 'https:' . $imageUrl;
                 }
+                // ⭐ NEU: GameStar Bilder vergrößern
+                if (strpos($imageUrl, 'images.cgames.de') !== false || strpos($imageUrl, 'gamestar') !== false) {
+                    // Ersetze kleine Bildgröße (z.B. /112/) mit größerer (z.B. /800/)
+                    $imageUrl = preg_replace('/\/(\d{2,4})\//', '/800/', $imageUrl);
+                }
             }
 
             // Methode 5: Für Feeds ohne Bilder (play3.de, xboxdynasty) -> Open Graph Image scrapen

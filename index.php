@@ -1410,6 +1410,17 @@ $totalPages = ceil($totalArticles / $perPage);
 
                     console.log('Got articles:', articles);
 
+                    // ⭐ NEU: Bereinige verwaiste Favoriten (IDs die nicht mehr in DB existieren)
+                    const validIds = articles.map(a => a.id);
+                    const orphanedIds = favoriteIds.filter(id => !validIds.includes(id));
+
+                    if (orphanedIds.length > 0) {
+                        console.log('Removing orphaned favorites:', orphanedIds);
+                        const cleanedFavorites = favoriteIds.filter(id => validIds.includes(id));
+                        localStorage.setItem('favorites', JSON.stringify(cleanedFavorites));
+                        document.getElementById('favCount').textContent = cleanedFavorites.length;
+                    }
+
                     if (articles.length === 0) {
                         const articlesDiv = document.querySelector('.articles');
                         articlesDiv.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Keine Favoriten gefunden. Möglicherweise wurden die Artikel gelöscht.</p>';
