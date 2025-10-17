@@ -107,11 +107,14 @@ $totalPages = ceil($totalArticles / $perPage);
                 --bg-card: #ffffff;
                 --text-primary: #1a1a1a;
                 --text-secondary: #6c757d;
-                --accent: #667eea;
-                --accent-hover: #5568d3;
+                --accent: #60a5fa;
+                --accent-hover: #3b8fd9;
                 --border: #e9ecef;
                 --shadow: rgba(0, 0, 0, 0.1);
                 --shadow-hover: rgba(0, 0, 0, 0.15);
+                /* Light Mode: Soft Blue Gradient 🫧 */
+                --gradient-start: #3b8fd9;
+                --gradient-end: #60a5fa;
             }
 
             [data-theme="dark"] {
@@ -125,6 +128,41 @@ $totalPages = ceil($totalArticles / $perPage);
                 --border: #3a3a3a;
                 --shadow: rgba(0, 0, 0, 0.3);
                 --shadow-hover: rgba(0, 0, 0, 0.5);
+                /* Dark Mode: Purple/Violet Gradient */
+                --gradient-start: #667eea;
+                --gradient-end: #764ba2;
+            }
+
+            [data-theme="sakura-light"] {
+                --bg-primary: #fff0f3;
+                --bg-secondary: #ffe4e9;
+                --bg-card: rgba(255, 255, 255, 0.8);
+                --text-primary: #2d2d2d;
+                --text-secondary: #666666;
+                --accent: #ffb7c5;
+                --accent-hover: #ff9eb5;
+                --border: #ffd4df;
+                --shadow: rgba(255, 183, 197, 0.15);
+                --shadow-hover: rgba(255, 183, 197, 0.25);
+                /* Sakura Light: Soft Pink Gradient */
+                --gradient-start: #ffb7c5;
+                --gradient-end: #ff9eb5;
+            }
+
+            [data-theme="sakura-dark"] {
+                --bg-primary: #2d1f2b;
+                --bg-secondary: #3d2935;
+                --bg-card: rgba(61, 41, 53, 0.8);
+                --text-primary: #f5e8f0;
+                --text-secondary: #d4b5c5;
+                --accent: #d4a5b5;
+                --accent-hover: #c48a9f;
+                --border: #4d3945;
+                --shadow: rgba(212, 165, 181, 0.2);
+                --shadow-hover: rgba(212, 165, 181, 0.3);
+                /* Sakura Dark: Elegant Dark Rose Gradient */
+                --gradient-start: #d4a5b5;
+                --gradient-end: #c48a9f;
             }
 
             * {
@@ -139,12 +177,34 @@ $totalPages = ceil($totalArticles / $perPage);
                 color: var(--text-primary);
                 line-height: 1.6;
                 transition: background-color 0.3s ease, color 0.3s ease;
+                position: relative;
+            }
+
+            /* Sakura Pattern for Sakura Themes */
+            [data-theme="sakura-light"] body::before,
+            [data-theme="sakura-dark"] body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffb7c5' fill-opacity='0.08' fill-rule='evenodd'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='15' cy='15' r='1.5'/%3E%3Ccircle cx='45' cy='45' r='1.5'/%3E%3Ccircle cx='15' cy='45' r='1'/%3E%3Ccircle cx='45' cy='15' r='1'/%3E%3C/g%3E%3C/svg%3E");
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.7;
+            }
+
+            [data-theme="sakura-dark"] body::before {
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a5b5' fill-opacity='0.12' fill-rule='evenodd'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='15' cy='15' r='1.5'/%3E%3Ccircle cx='45' cy='45' r='1.5'/%3E%3Ccircle cx='15' cy='45' r='1'/%3E%3Ccircle cx='45' cy='15' r='1'/%3E%3C/g%3E%3C/svg%3E");
             }
 
             .container {
                 max-width: 1200px;
                 margin: 0 auto;
                 padding: 20px;
+                position: relative;
+                z-index: 1;
             }
 
             /* Header */
@@ -161,7 +221,7 @@ $totalPages = ceil($totalArticles / $perPage);
                 font-size: 2.5em;
                 text-align: center;
                 margin-bottom: 10px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -180,8 +240,8 @@ $totalPages = ceil($totalArticles / $perPage);
                 color: var(--text-secondary);
             }
 
-            /* Dark Mode Toggle */
-            .theme-toggle {
+            /* Theme Toggle - Hybrid (wie Layout Toggle) */
+            .theme-toggle-hybrid {
                 position: absolute;
                 top: 20px;
                 right: 20px;
@@ -189,17 +249,234 @@ $totalPages = ceil($totalArticles / $perPage);
                 border: 2px solid var(--border);
                 border-radius: 50px;
                 padding: 8px 16px;
-                cursor: pointer;
                 display: flex;
                 align-items: center;
                 gap: 8px;
                 transition: all 0.3s ease;
             }
 
-            .theme-toggle:hover {
+            .theme-toggle-hybrid:hover {
+                border-color: var(--accent);
+            }
+
+            .theme-toggle-hybrid > .theme-dropdown-menu {
+                position: absolute;
+                top: calc(100% + 10px);
+                right: 0;
+            }
+
+            .theme-current {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                padding-right: 10px;
+                border-right: 1px solid var(--border);
+            }
+
+            .theme-current:hover {
+                color: var(--accent);
+            }
+
+            .theme-dropdown-arrow {
+                cursor: pointer;
+                padding-left: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            .theme-dropdown-arrow:hover {
+                color: var(--accent);
+            }
+
+            .theme-dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                margin-top: 10px;
+                background: var(--bg-card);
+                border: 2px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 4px 20px var(--shadow);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s ease;
+                z-index: 1000;
+                width: 200px;
+                white-space: nowrap;
+            }
+
+            .theme-dropdown-menu.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .theme-option {
+                padding: 12px 20px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: var(--text-primary);
+            }
+
+            .theme-option:first-child {
+                border-radius: 10px 10px 0 0;
+            }
+
+            .theme-option:last-child {
+                border-radius: 0 0 10px 10px;
+            }
+
+            .theme-option:hover {
+                background: var(--bg-secondary);
+            }
+
+            .theme-option.active {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+                color: white;
+            }
+
+            /* Sakura Petals Toggle Button */
+            .sakura-petals-toggle {
+                position: absolute;
+                top: 20px;
+                right: 230px;
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                border-radius: 50px;
+                padding: 8px 16px;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                font-family: inherit;
+                font-size: 0.9em;
+                color: var(--text-primary);
+            }
+
+            .sakura-petals-toggle:hover {
                 transform: scale(1.05);
                 border-color: var(--accent);
             }
+
+            .sakura-petals-toggle.active {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+                color: white;
+                border-color: transparent;
+            }
+
+            /* Fix: In Sakura Light - dunkle Schrift für bessere Lesbarkeit */
+            [data-theme="sakura-light"] .sakura-petals-toggle.active {
+                color: #2d2d2d;
+            }
+
+            /* Show petals toggle only for Sakura themes */
+            [data-theme="sakura-light"] .sakura-petals-toggle,
+            [data-theme="sakura-dark"] .sakura-petals-toggle {
+                display: flex;
+            }
+
+            /* Fallende Sakura Blütenblätter Animation */
+            @keyframes sakura-fall {
+                0% {
+                    transform: translateY(-10vh) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(110vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+
+            .sakura-petal {
+                position: fixed;
+                width: 15px;
+                height: 15px;
+                background: radial-gradient(circle, #ffb7c5 0%, #ff9eb5 100%);
+                border-radius: 50% 0 50% 0;
+                opacity: 0.6;
+                animation: sakura-fall linear infinite;
+                pointer-events: none;
+                z-index: 9999;
+            }
+
+            [data-theme="sakura-dark"] .sakura-petal {
+                background: radial-gradient(circle, #d4a5b5 0%, #c48a9f 100%);
+            }
+
+            .sakura-petal:nth-child(1) { left: 10%; animation-duration: 25s; animation-delay: 0s; }
+            .sakura-petal:nth-child(2) { left: 25%; animation-duration: 30s; animation-delay: 4s; }
+            .sakura-petal:nth-child(3) { left: 40%; animation-duration: 22s; animation-delay: 8s; }
+            .sakura-petal:nth-child(4) { left: 55%; animation-duration: 35s; animation-delay: 3s; }
+            .sakura-petal:nth-child(5) { left: 70%; animation-duration: 28s; animation-delay: 7s; }
+            .sakura-petal:nth-child(6) { left: 85%; animation-duration: 32s; animation-delay: 10s; }
+
+            /* Sakura Petals Toggle Button */
+            .sakura-petals-toggle {
+                position: absolute;
+                top: 20px;
+                right: 240px;
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                border-radius: 50px;
+                padding: 8px 16px;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .sakura-petals-toggle.show {
+                display: flex;
+            }
+
+            .sakura-petals-toggle.active {
+                border-color: var(--accent);
+                background: var(--bg-card);
+            }
+
+            .sakura-petals-toggle:hover {
+                transform: scale(1.05);
+                border-color: var(--accent);
+            }
+
+            /* Falling Sakura Petals Animation */
+            @keyframes sakuraFall {
+                0% {
+                    transform: translateY(-10vh) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(110vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+
+            .sakura-petal {
+                position: fixed;
+                width: 12px;
+                height: 12px;
+                background: radial-gradient(circle, var(--accent) 0%, var(--gradient-end) 100%);
+                border-radius: 50% 0 50% 0;
+                opacity: 0.7;
+                animation: sakuraFall linear infinite;
+                pointer-events: none;
+                z-index: 9999;
+            }
+
+            .sakura-petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 10px; height: 10px; }
+            .sakura-petal:nth-child(2) { left: 25%; animation-duration: 15s; animation-delay: 2s; width: 14px; height: 14px; }
+            .sakura-petal:nth-child(3) { left: 40%; animation-duration: 10s; animation-delay: 4s; width: 11px; height: 11px; }
+            .sakura-petal:nth-child(4) { left: 55%; animation-duration: 18s; animation-delay: 1s; width: 13px; height: 13px; }
+            .sakura-petal:nth-child(5) { left: 70%; animation-duration: 14s; animation-delay: 3s; width: 12px; height: 12px; }
+            .sakura-petal:nth-child(6) { left: 85%; animation-duration: 16s; animation-delay: 5s; width: 10px; height: 10px; }
 
             /* Layout Toggle - Hybrid */
             .layout-toggle-hybrid {
@@ -293,7 +570,7 @@ $totalPages = ceil($totalArticles / $perPage);
             }
 
             .layout-option-hybrid.active {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
             }
 
@@ -349,7 +626,7 @@ $totalPages = ceil($totalArticles / $perPage);
 
             .search-btn {
                 padding: 12px 30px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 border: none;
                 border-radius: 25px;
@@ -411,9 +688,9 @@ $totalPages = ceil($totalArticles / $perPage);
             }
 
             .filter-btn.active {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
-                border-color: #667eea;
+                border-color: var(--gradient-start);
                 box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
             }
 
@@ -497,7 +774,7 @@ $totalPages = ceil($totalArticles / $perPage);
                 width: 100%;
                 height: 200px;
                 object-fit: cover;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             }
 
             .article-image.no-image {
@@ -525,7 +802,7 @@ $totalPages = ceil($totalArticles / $perPage);
             }
 
             .source {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 padding: 4px 12px;
                 border-radius: 12px;
@@ -622,7 +899,7 @@ $totalPages = ceil($totalArticles / $perPage);
 
             .page-link {
                 padding: 12px 24px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 text-decoration: none;
                 border-radius: 10px;
@@ -658,7 +935,7 @@ $totalPages = ceil($totalArticles / $perPage);
             .update-btn {
                 display: inline-block;
                 padding: 12px 30px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 text-decoration: none;
                 border-radius: 10px;
@@ -707,7 +984,7 @@ $totalPages = ceil($totalArticles / $perPage);
                     width: 100%;
                 }
 
-                .theme-toggle, .layout-toggle {
+                .theme-toggle-hybrid, .layout-toggle-hybrid, .sakura-petals-toggle {
                     position: static;
                     margin: 10px auto 0;
                     font-size: 0.9em;
@@ -741,7 +1018,7 @@ $totalPages = ceil($totalArticles / $perPage);
                 right: 30px;
                 width: 50px;
                 height: 50px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 border: none;
                 border-radius: 50%;
@@ -889,9 +1166,9 @@ $totalPages = ceil($totalArticles / $perPage);
             }
 
             .date-filter-btn.active {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
-                border-color: #667eea;
+                border-color: var(--gradient-start);
             }
 
             /* Auto-refresh notification */
@@ -986,9 +1263,34 @@ $totalPages = ceil($totalArticles / $perPage);
                 </div>
             </div>
 
-            <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">
-                <span id="theme-icon">🌙</span>
-                <span id="theme-text">Dark</span>
+            <div class="theme-toggle-hybrid">
+                <div class="theme-current" onclick="cycleTheme()">
+                    <span id="theme-icon">☀️</span>
+                    <span id="theme-text">Light</span>
+                </div>
+                <div class="theme-dropdown-arrow" onclick="toggleThemeDropdown()">
+                    <span>▼</span>
+                </div>
+
+                <div class="theme-dropdown-menu" id="themeDropdown">
+                    <div class="theme-option active" onclick="event.stopPropagation(); changeTheme('light')">
+                        <span>☀️</span> Light Mode
+                    </div>
+                    <div class="theme-option" onclick="event.stopPropagation(); changeTheme('dark')">
+                        <span>🌙</span> Dark Mode
+                    </div>
+                    <div class="theme-option" onclick="event.stopPropagation(); changeTheme('sakura-light')">
+                        <span>🌸</span> Sakura Light
+                    </div>
+                    <div class="theme-option" onclick="event.stopPropagation(); changeTheme('sakura-dark')">
+                        <span>🌸</span> Sakura Dark
+                    </div>
+                </div>
+            </div>
+
+            <button class="sakura-petals-toggle" id="sakuraPetalsToggle" onclick="toggleSakuraPetals()" title="Sakura Blütenblätter Animation">
+                <span id="petals-icon">🌸</span>
+                <span id="petals-text">Blütenblätter</span>
             </button>
 
             <h1>🎮 Gaming News Aggregator</h1>
@@ -1178,39 +1480,179 @@ $totalPages = ceil($totalArticles / $perPage);
         <script>
             console.log('=== Script started ===');
 
-            // Dark/Light Mode Toggle
-            function toggleTheme() {
-                const html = document.documentElement;
-                const currentTheme = html.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            // Theme System (4 Themes: Light, Dark, Sakura Light, Sakura Dark)
+            const themes = ['light', 'dark', 'sakura-light', 'sakura-dark'];
+            const themeConfig = {
+                'light': { icon: '☀️', text: 'Light' },
+                'dark': { icon: '🌙', text: 'Dark' },
+                'sakura-light': { icon: '🌸', text: 'Sakura Light' },
+                'sakura-dark': { icon: '🌸', text: 'Sakura Dark' }
+            };
 
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
+            function changeTheme(theme) {
+                const html = document.documentElement;
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
 
                 // Update button
                 const icon = document.getElementById('theme-icon');
                 const text = document.getElementById('theme-text');
-                if (newTheme === 'dark') {
-                    icon.textContent = '🌙';
-                    text.textContent = 'Dark';
-                } else {
-                    icon.textContent = '☀️';
-                    text.textContent = 'Light';
+                const config = themeConfig[theme];
+                icon.textContent = config.icon;
+                text.textContent = config.text;
+
+                // Update active state in dropdown
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                document.querySelector(`.theme-option[onclick*="${theme}"]`).classList.add('active');
+
+                // Close dropdown
+                document.getElementById('themeDropdown').classList.remove('show');
+
+                // Update Sakura Petals Toggle visibility
+                updateSakuraPetalsToggleVisibility();
+
+                // Initialize petals for Sakura themes if no saved state exists
+                const isSakuraTheme = theme === 'sakura-light' || theme === 'sakura-dark';
+                if (isSakuraTheme) {
+                    const savedPetalsState = localStorage.getItem('sakuraPetals');
+
+                    // If first time switching to Sakura theme, auto-enable on desktop
+                    if (savedPetalsState === null || savedPetalsState === undefined) {
+                        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                        sakuraPetalsActive = !isMobile;
+                        localStorage.setItem('sakuraPetals', sakuraPetalsActive);
+
+                        const toggle = document.getElementById('sakuraPetalsToggle');
+                        const petalsIcon = document.getElementById('petals-icon');
+                        const petalsText = document.getElementById('petals-text');
+
+                        if (sakuraPetalsActive) {
+                            createSakuraPetals();
+                            toggle.classList.add('active');
+                            petalsIcon.textContent = '🌸✨';
+                        } else {
+                            petalsIcon.textContent = '🌸';
+                        }
+                        petalsText.textContent = 'Blütenblätter';
+                    }
                 }
             }
 
-            // Toggle Dropdown
+            function cycleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                const currentIndex = themes.indexOf(currentTheme);
+                const nextIndex = (currentIndex + 1) % themes.length;
+                const nextTheme = themes[nextIndex];
+
+                changeTheme(nextTheme);
+            }
+
+            function toggleThemeDropdown() {
+                const dropdown = document.getElementById('themeDropdown');
+                const layoutDropdown = document.getElementById('layoutDropdown');
+
+                // Close layout dropdown if open
+                layoutDropdown.classList.remove('show');
+
+                dropdown.classList.toggle('show');
+            }
+
+            // Sakura Petals Animation System
+            let sakuraPetalsActive = false;
+            let sakuraPetalsContainer = null;
+
+            function createSakuraPetals() {
+                if (sakuraPetalsContainer) return; // Already exists
+
+                sakuraPetalsContainer = document.createElement('div');
+                sakuraPetalsContainer.id = 'sakuraPetalsContainer';
+                sakuraPetalsContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;';
+
+                // Create 6 petals
+                for (let i = 0; i < 6; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'sakura-petal';
+                    sakuraPetalsContainer.appendChild(petal);
+                }
+
+                document.body.appendChild(sakuraPetalsContainer);
+            }
+
+            function removeSakuraPetals() {
+                if (sakuraPetalsContainer) {
+                    sakuraPetalsContainer.remove();
+                    sakuraPetalsContainer = null;
+                }
+            }
+
+            function toggleSakuraPetals() {
+                sakuraPetalsActive = !sakuraPetalsActive;
+                localStorage.setItem('sakuraPetals', sakuraPetalsActive);
+
+                const toggle = document.getElementById('sakuraPetalsToggle');
+                const icon = document.getElementById('petals-icon');
+                const text = document.getElementById('petals-text');
+
+                if (sakuraPetalsActive) {
+                    createSakuraPetals();
+                    toggle.classList.add('active');
+                    icon.textContent = '🌸✨';
+                    text.textContent = 'Blütenblätter';
+                } else {
+                    removeSakuraPetals();
+                    toggle.classList.remove('active');
+                    icon.textContent = '🌸';
+                    text.textContent = 'Blütenblätter';
+                }
+            }
+
+            function updateSakuraPetalsToggleVisibility() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const toggle = document.getElementById('sakuraPetalsToggle');
+                const isSakuraTheme = currentTheme === 'sakura-light' || currentTheme === 'sakura-dark';
+
+                if (isSakuraTheme) {
+                    toggle.classList.add('show');
+                } else {
+                    toggle.classList.remove('show');
+                    // Remove petals if switching away from Sakura theme
+                    if (sakuraPetalsActive) {
+                        removeSakuraPetals();
+                        sakuraPetalsActive = false;
+                        localStorage.setItem('sakuraPetals', false);
+                        toggle.classList.remove('active');
+                        document.getElementById('petals-icon').textContent = '🌸';
+                    }
+                }
+            }
+
+            // Toggle Dropdown (Layout)
             function toggleDropdown() {
                 const dropdown = document.getElementById('layoutDropdown');
+                const themeDropdown = document.getElementById('themeDropdown');
+
+                // Close theme dropdown if open
+                themeDropdown.classList.remove('show');
+
                 dropdown.classList.toggle('show');
             }
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function(event) {
-                const dropdown = document.getElementById('layoutDropdown');
-                const toggle = document.querySelector('.layout-toggle-hybrid');
-                if (!toggle.contains(event.target)) {
-                    dropdown.classList.remove('show');
+                const layoutDropdown = document.getElementById('layoutDropdown');
+                const layoutToggle = document.querySelector('.layout-toggle-hybrid');
+                const themeDropdown = document.getElementById('themeDropdown');
+                const themeToggle = document.querySelector('.theme-toggle-hybrid');
+
+                if (!layoutToggle.contains(event.target)) {
+                    layoutDropdown.classList.remove('show');
+                }
+
+                if (!themeToggle.contains(event.target)) {
+                    themeDropdown.classList.remove('show');
                 }
             });
 
@@ -1537,18 +1979,30 @@ $totalPages = ceil($totalArticles / $perPage);
             (function() {
                 console.log('=== IIFE started ===');
 
-                // Theme
+                // Theme (4 Themes: Light, Dark, Sakura Light, Sakura Dark)
                 const savedTheme = localStorage.getItem('theme') || 'light';
                 document.documentElement.setAttribute('data-theme', savedTheme);
 
                 const themeIcon = document.getElementById('theme-icon');
                 const themeText = document.getElementById('theme-text');
-                if (savedTheme === 'dark') {
-                    themeIcon.textContent = '🌙';
-                    themeText.textContent = 'Dark';
-                } else {
-                    themeIcon.textContent = '☀️';
-                    themeText.textContent = 'Light';
+                const themeConfig = {
+                    'light': { icon: '☀️', text: 'Light' },
+                    'dark': { icon: '🌙', text: 'Dark' },
+                    'sakura-light': { icon: '🌸', text: 'Sakura Light' },
+                    'sakura-dark': { icon: '🌸', text: 'Sakura Dark' }
+                };
+
+                const config = themeConfig[savedTheme] || themeConfig['light'];
+                themeIcon.textContent = config.icon;
+                themeText.textContent = config.text;
+
+                // Update active state in theme dropdown
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                const activeThemeOption = document.querySelector(`.theme-option[onclick*="${savedTheme}"]`);
+                if (activeThemeOption) {
+                    activeThemeOption.classList.add('active');
                 }
 
                 // Layout
@@ -1573,6 +2027,48 @@ $totalPages = ceil($totalArticles / $perPage);
                 // Load Favoriten
                 loadFavorites();
                 updateFavoriteCount();
+
+                // Sakura Petals Initialisierung
+                updateSakuraPetalsToggleVisibility();
+
+                // Detect if mobile
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                // Load saved petals state or use default (ON for desktop, OFF for mobile)
+                const savedPetalsState = localStorage.getItem('sakuraPetals');
+                const isSakuraTheme = savedTheme === 'sakura-light' || savedTheme === 'sakura-dark';
+
+                console.log('🌸 Init Petals - isMobile:', isMobile, 'savedState:', savedPetalsState, 'isSakuraTheme:', isSakuraTheme);
+
+                if (isSakuraTheme) {
+                    const toggle = document.getElementById('sakuraPetalsToggle');
+                    const icon = document.getElementById('petals-icon');
+                    const text = document.getElementById('petals-text');
+
+                    // If no saved state exists, use default based on device
+                    if (savedPetalsState === null || savedPetalsState === undefined) {
+                        sakuraPetalsActive = !isMobile; // ON for desktop, OFF for mobile
+                        localStorage.setItem('sakuraPetals', sakuraPetalsActive);
+                        console.log('🌸 No saved state - setting default:', sakuraPetalsActive);
+                    } else {
+                        sakuraPetalsActive = savedPetalsState === 'true';
+                        console.log('🌸 Using saved state:', sakuraPetalsActive);
+                    }
+
+                    // Apply the state
+                    if (sakuraPetalsActive) {
+                        console.log('🌸 Creating petals...');
+                        createSakuraPetals();
+                        toggle.classList.add('active');
+                        icon.textContent = '🌸✨';
+                    } else {
+                        console.log('🌸 Petals disabled');
+                        icon.textContent = '🌸';
+                    }
+
+                    // Text bleibt immer gleich
+                    text.textContent = 'Blütenblätter';
+                }
             })();
 
             // AJAX Feed Update (kein Redirect!)
