@@ -321,7 +321,10 @@ if (!empty($errors)) {
 
 echo "<p><strong>Ende:</strong> " . date('d.m.Y H:i:s') . "</p>";
 echo "<hr>";
-echo "<p><a href='index.php'>→ Zur Startseite</a> | <a href='fetch_feeds.php'>🔄 Feeds erneut abrufen</a></p>";
+echo "<p><a href='index.php'>→ Zur Startseite</a> | <a href='fetch_feeds.php'>🔄 Feeds erneut abrufen</a> | <a href='reset_db.php'>🧹 Datenbank zurücksetzen</a></p>";
+
+
+
 
 echo "</body></html>";
 ?>

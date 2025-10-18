@@ -100,6 +100,13 @@ $totalPages = ceil($totalArticles / $perPage);
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>🎮 Gaming News Aggregator</title>
+        <!-- Prevent Theme Flash: Load theme IMMEDIATELY -->
+        <script>
+            (function() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            })();
+        </script>
         <style>
             :root {
                 --bg-primary: #ffffff;
@@ -220,6 +227,7 @@ $totalPages = ceil($totalArticles / $perPage);
             header h1 {
                 font-size: 2.5em;
                 text-align: center;
+                margin-top: 20px;
                 margin-bottom: 10px;
                 background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 -webkit-background-clip: text;
@@ -307,6 +315,12 @@ $totalPages = ceil($totalArticles / $perPage);
                 white-space: nowrap;
             }
 
+            /* Dark Mode: Lila-Schatten für Dropdown */
+            [data-theme="dark"] .theme-dropdown-menu {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            }
+
+
             .theme-dropdown-menu.show {
                 opacity: 1;
                 visibility: visible;
@@ -335,10 +349,38 @@ $totalPages = ceil($totalArticles / $perPage);
                 background: var(--bg-secondary);
             }
 
+            /* Dark Mode: Hellerer Hover (kein Glow) */
+            [data-theme="dark"] .theme-option:hover {
+                background: rgba(255, 255, 255, 0.1);
+                box-shadow: none;
+            }
+
+            /* Light Mode: Dunklerer Hover für bessere Sichtbarkeit */
+            [data-theme="light"] .theme-option:hover {
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            /* Sakura Dark: Hellerer Hover für bessere Sichtbarkeit */
+            [data-theme="sakura-dark"] .theme-option:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+
+
             .theme-option.active {
                 background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
             }
+
+            /* Aktive Option behält Farbe beim Hover */
+            .theme-option.active:hover {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            }
+
+            [data-theme="dark"] .theme-option.active:hover {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            }
+
 
             /* Sakura Petals Toggle Button */
             .sakura-petals-toggle {
@@ -352,27 +394,59 @@ $totalPages = ceil($totalArticles / $perPage);
                 cursor: pointer;
                 display: none;
                 align-items: center;
-                gap: 8px;
+                justify-content: space-between;
+                gap: 12px;
                 transition: all 0.3s ease;
                 font-family: inherit;
                 font-size: 0.9em;
                 color: var(--text-primary);
+                min-width: 200px;
             }
 
-            .sakura-petals-toggle:hover {
-                transform: scale(1.05);
-                border-color: var(--accent);
+            .sakura-petals-toggle .petals-label {
+                display: flex;
+                align-items: center;
+                gap: 6px;
             }
 
-            .sakura-petals-toggle.active {
-                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-                color: white;
-                border-color: transparent;
+            /* iOS-Style Toggle Switch */
+            .toggle-switch {
+                position: relative;
+                width: 44px;
+                height: 24px;
+                background: #ccc;
+                border-radius: 24px;
+                transition: background-color 0.3s ease;
+                flex-shrink: 0;
             }
 
-            /* Fix: In Sakura Light - dunkle Schrift für bessere Lesbarkeit */
-            [data-theme="sakura-light"] .sakura-petals-toggle.active {
-                color: #2d2d2d;
+            .toggle-slider {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 20px;
+                height: 20px;
+                background: white;
+                border-radius: 50%;
+                transition: transform 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            /* Active State - Toggle ON */
+            .sakura-petals-toggle.active .toggle-switch {
+                background: var(--accent);
+            }
+
+            [data-theme="sakura-light"] .sakura-petals-toggle.active .toggle-switch {
+                background: #ff9eb5;
+            }
+
+            [data-theme="sakura-dark"] .sakura-petals-toggle.active .toggle-switch {
+                background: #d4a5b5;
+            }
+
+            .sakura-petals-toggle.active .toggle-slider {
+                transform: translateX(20px);
             }
 
             /* Show petals toggle only for Sakura themes */
@@ -382,39 +456,147 @@ $totalPages = ceil($totalArticles / $perPage);
             }
 
             /* Fallende Sakura Blütenblätter Animation */
-            @keyframes sakura-fall {
-                0% {
-                    transform: translateY(-10vh) rotate(0deg);
-                    opacity: 1;
+            /* Sakura Petals Animation - NEU & CLEAN */
+            @keyframes sakuraPetalFall {
+                from {
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                    opacity: 0;
                 }
-                100% {
-                    transform: translateY(110vh) rotate(360deg);
+                5% {
+                    opacity: 0.7;
+                }
+                95% {
+                    opacity: 0.7;
+                }
+                to {
+                    transform: translateY(100vh) translateX(50px) rotate(360deg);
                     opacity: 0;
                 }
             }
 
             .sakura-petal {
                 position: fixed;
-                width: 15px;
-                height: 15px;
+                top: -20px;
+                width: 12px;
+                height: 12px;
                 background: radial-gradient(circle, #ffb7c5 0%, #ff9eb5 100%);
                 border-radius: 50% 0 50% 0;
-                opacity: 0.6;
-                animation: sakura-fall linear infinite;
+                animation: sakuraPetalFall linear infinite;
                 pointer-events: none;
                 z-index: 9999;
+                will-change: transform, opacity;
             }
 
             [data-theme="sakura-dark"] .sakura-petal {
                 background: radial-gradient(circle, #d4a5b5 0%, #c48a9f 100%);
             }
 
-            .sakura-petal:nth-child(1) { left: 10%; animation-duration: 25s; animation-delay: 0s; }
-            .sakura-petal:nth-child(2) { left: 25%; animation-duration: 30s; animation-delay: 4s; }
-            .sakura-petal:nth-child(3) { left: 40%; animation-duration: 22s; animation-delay: 8s; }
-            .sakura-petal:nth-child(4) { left: 55%; animation-duration: 35s; animation-delay: 3s; }
-            .sakura-petal:nth-child(5) { left: 70%; animation-duration: 28s; animation-delay: 7s; }
-            .sakura-petal:nth-child(6) { left: 85%; animation-duration: 32s; animation-delay: 10s; }
+            /* Sakura Theme: Rosa Glow statt Blau für interaktive Elemente */
+            [data-theme="sakura-light"] .search-input:focus,
+            [data-theme="sakura-dark"] .search-input:focus {
+                box-shadow: 0 0 0 3px rgba(255, 158, 181, 0.2);
+            }
+
+            [data-theme="sakura-light"] .search-btn:hover,
+            [data-theme="sakura-dark"] .search-btn:hover {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+            [data-theme="sakura-light"] .page-link:hover,
+            [data-theme="sakura-dark"] .page-link:hover {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+            [data-theme="sakura-light"] .update-btn:hover,
+            [data-theme="sakura-dark"] .update-btn:hover {
+                box-shadow: 0 6px 20px rgba(255, 158, 181, 0.4);
+            }
+
+            [data-theme="sakura-light"] .scroll-top:hover,
+            [data-theme="sakura-dark"] .scroll-top:hover {
+                box-shadow: 0 6px 20px rgba(255, 158, 181, 0.6);
+            }
+
+            [data-theme="sakura-light"] .scroll-top,
+            [data-theme="sakura-dark"] .scroll-top {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+            [data-theme="sakura-light"] .filter-btn.active,
+            [data-theme="sakura-dark"] .filter-btn.active {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+            /* Light Theme: Grauer/neutraler Glow für alle interaktiven Elemente */
+            [data-theme="light"] .search-input:focus {
+                box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+            }
+
+            [data-theme="light"] .search-btn:hover {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            [data-theme="light"] .page-link:hover {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            [data-theme="light"] .update-btn:hover {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            [data-theme="light"] .scroll-top {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            [data-theme="light"] .scroll-top:hover {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            [data-theme="light"] .filter-btn.active {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+
+
+            .sakura-petal:nth-child(1) {
+                left: 10%;
+                animation-duration: 20s;
+                animation-delay: 0s;
+            }
+            .sakura-petal:nth-child(2) {
+                left: 25%;
+                animation-duration: 25s;
+                animation-delay: 1s;
+                width: 14px;
+                height: 14px;
+            }
+            .sakura-petal:nth-child(3) {
+                left: 45%;
+                animation-duration: 18s;
+                animation-delay: 0.5s;
+                width: 11px;
+                height: 11px;
+            }
+            .sakura-petal:nth-child(4) {
+                left: 60%;
+                animation-duration: 28s;
+                animation-delay: 2s;
+                width: 13px;
+                height: 13px;
+            }
+            .sakura-petal:nth-child(5) {
+                left: 75%;
+                animation-duration: 22s;
+                animation-delay: 1.5s;
+            }
+            .sakura-petal:nth-child(6) {
+                left: 90%;
+                animation-duration: 26s;
+                animation-delay: 0.8s;
+                width: 10px;
+                height: 10px;
+            }
+
 
             /* Sakura Petals Toggle Button */
             .sakura-petals-toggle {
@@ -442,41 +624,10 @@ $totalPages = ceil($totalArticles / $perPage);
                 background: var(--bg-card);
             }
 
-            .sakura-petals-toggle:hover {
-                transform: scale(1.05);
-                border-color: var(--accent);
-            }
-
             /* Falling Sakura Petals Animation */
-            @keyframes sakuraFall {
-                0% {
-                    transform: translateY(-10vh) rotate(0deg);
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(110vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
 
-            .sakura-petal {
-                position: fixed;
-                width: 12px;
-                height: 12px;
-                background: radial-gradient(circle, var(--accent) 0%, var(--gradient-end) 100%);
-                border-radius: 50% 0 50% 0;
-                opacity: 0.7;
-                animation: sakuraFall linear infinite;
-                pointer-events: none;
-                z-index: 9999;
-            }
 
-            .sakura-petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 10px; height: 10px; }
-            .sakura-petal:nth-child(2) { left: 25%; animation-duration: 15s; animation-delay: 2s; width: 14px; height: 14px; }
-            .sakura-petal:nth-child(3) { left: 40%; animation-duration: 10s; animation-delay: 4s; width: 11px; height: 11px; }
-            .sakura-petal:nth-child(4) { left: 55%; animation-duration: 18s; animation-delay: 1s; width: 13px; height: 13px; }
-            .sakura-petal:nth-child(5) { left: 70%; animation-duration: 14s; animation-delay: 3s; width: 12px; height: 12px; }
-            .sakura-petal:nth-child(6) { left: 85%; animation-duration: 16s; animation-delay: 5s; width: 10px; height: 10px; }
+
 
             /* Layout Toggle - Hybrid */
             .layout-toggle-hybrid {
@@ -491,7 +642,13 @@ $totalPages = ceil($totalArticles / $perPage);
                 align-items: center;
                 gap: 8px;
                 transition: all 0.3s ease;
+                cursor: pointer;
             }
+
+            .layout-toggle-hybrid:hover {
+                border-color: var(--accent);
+            }
+
 
             .layout-toggle-hybrid > .layout-dropdown-menu {
                 position: absolute;
@@ -541,6 +698,12 @@ $totalPages = ceil($totalArticles / $perPage);
                 white-space: nowrap;
             }
 
+            /* Dark Mode: Lila-Schatten für Dropdown */
+            [data-theme="dark"] .layout-dropdown-menu {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            }
+
+
             .layout-dropdown-menu.show {
                 opacity: 1;
                 visibility: visible;
@@ -569,10 +732,38 @@ $totalPages = ceil($totalArticles / $perPage);
                 background: var(--bg-secondary);
             }
 
+            /* Dark Mode: Hellerer Hover (kein Glow) */
+            [data-theme="dark"] .layout-option-hybrid:hover {
+                background: rgba(255, 255, 255, 0.1);
+                box-shadow: none;
+            }
+
+            /* Light Mode: Dunklerer Hover für bessere Sichtbarkeit */
+            [data-theme="light"] .layout-option-hybrid:hover {
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            /* Sakura Dark: Hellerer Hover für bessere Sichtbarkeit */
+            [data-theme="sakura-dark"] .layout-option-hybrid:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+
+
             .layout-option-hybrid.active {
                 background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
             }
+
+            /* Aktive Option behält Farbe beim Hover */
+            .layout-option-hybrid.active:hover {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            }
+
+            [data-theme="dark"] .layout-option-hybrid.active:hover {
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            }
+
 
             /* Filter */
             .filter-container {
@@ -687,6 +878,12 @@ $totalPages = ceil($totalArticles / $perPage);
                 border-color: var(--accent);
             }
 
+            /* Dark Mode: Lila-Glow beim Hover */
+            [data-theme="dark"] .filter-btn:hover {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+
             .filter-btn.active {
                 background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
@@ -769,6 +966,19 @@ $totalPages = ceil($totalArticles / $perPage);
                 transform: translateY(-8px);
                 box-shadow: 0 8px 30px var(--shadow-hover);
             }
+
+            /* Dark Mode: Lila-Glow für Artikel Cards */
+            [data-theme="dark"] .article-card:hover {
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+            }
+
+            /* Sakura Themes: Rosa Glow für Artikel Cards */
+            [data-theme="sakura-light"] .article-card:hover,
+            [data-theme="sakura-dark"] .article-card:hover {
+                box-shadow: 0 8px 30px rgba(255, 158, 181, 0.3);
+            }
+
+
 
             .article-image {
                 width: 100%;
@@ -1076,6 +1286,12 @@ $totalPages = ceil($totalArticles / $perPage);
                 transform: none;
             }
 
+            /* Dark Mode: Lila-Glow für Compact View */
+            [data-theme="dark"] .articles.compact-view .article-card:hover {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            }
+
+
             .articles.compact-view .article-image,
             .articles.compact-view .article-image.no-image {
                 display: none;
@@ -1163,13 +1379,45 @@ $totalPages = ceil($totalArticles / $perPage);
             .date-filter-btn:hover {
                 border-color: var(--accent);
                 transform: translateY(-2px);
+                box-shadow: 0 4px 12px var(--shadow-hover);
             }
+
+            /* Dark Mode: Lila-Glow beim Hover */
+            [data-theme="dark"] .date-filter-btn:hover {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            /* Sakura Themes: Rosa-Glow beim Hover */
+            [data-theme="sakura-light"] .date-filter-btn:hover,
+            [data-theme="sakura-dark"] .date-filter-btn:hover {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+
 
             .date-filter-btn.active {
                 background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
                 color: white;
                 border-color: var(--gradient-start);
             }
+
+            /* Dark Mode: Lila-Glow für aktive Datum-Filter */
+            [data-theme="dark"] .date-filter-btn.active {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            /* Light Mode: Grauer Glow für aktive Datum-Filter */
+            [data-theme="light"] .date-filter-btn.active {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Sakura Themes: Rosa Glow für aktive Datum-Filter */
+            [data-theme="sakura-light"] .date-filter-btn.active,
+            [data-theme="sakura-dark"] .date-filter-btn.active {
+                box-shadow: 0 4px 15px rgba(255, 158, 181, 0.4);
+            }
+
+
 
             /* Auto-refresh notification */
             .refresh-notification {
@@ -1289,8 +1537,13 @@ $totalPages = ceil($totalArticles / $perPage);
             </div>
 
             <button class="sakura-petals-toggle" id="sakuraPetalsToggle" onclick="toggleSakuraPetals()" title="Sakura Blütenblätter Animation">
-                <span id="petals-icon">🌸</span>
-                <span id="petals-text">Blütenblätter</span>
+                <span class="petals-label">
+                    <span id="petals-icon">🌸</span>
+                    <span id="petals-text">Blütenblätter</span>
+                </span>
+                <span class="toggle-switch">
+                    <span class="toggle-slider"></span>
+                </span>
             </button>
 
             <h1>🎮 Gaming News Aggregator</h1>
@@ -1477,624 +1730,12 @@ $totalPages = ceil($totalArticles / $perPage);
             <button onclick="window.location.reload()">Jetzt laden</button>
         </div>
 
+        <!-- PHP Variablen für JavaScript -->
         <script>
-            console.log('=== Script started ===');
-
-            // Theme System (4 Themes: Light, Dark, Sakura Light, Sakura Dark)
-            const themes = ['light', 'dark', 'sakura-light', 'sakura-dark'];
-            const themeConfig = {
-                'light': { icon: '☀️', text: 'Light' },
-                'dark': { icon: '🌙', text: 'Dark' },
-                'sakura-light': { icon: '🌸', text: 'Sakura Light' },
-                'sakura-dark': { icon: '🌸', text: 'Sakura Dark' }
-            };
-
-            function changeTheme(theme) {
-                const html = document.documentElement;
-                html.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-
-                // Update button
-                const icon = document.getElementById('theme-icon');
-                const text = document.getElementById('theme-text');
-                const config = themeConfig[theme];
-                icon.textContent = config.icon;
-                text.textContent = config.text;
-
-                // Update active state in dropdown
-                document.querySelectorAll('.theme-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                document.querySelector(`.theme-option[onclick*="${theme}"]`).classList.add('active');
-
-                // Close dropdown
-                document.getElementById('themeDropdown').classList.remove('show');
-
-                // Update Sakura Petals Toggle visibility
-                updateSakuraPetalsToggleVisibility();
-
-                // Initialize petals for Sakura themes if no saved state exists
-                const isSakuraTheme = theme === 'sakura-light' || theme === 'sakura-dark';
-                if (isSakuraTheme) {
-                    const savedPetalsState = localStorage.getItem('sakuraPetals');
-
-                    // If first time switching to Sakura theme, auto-enable on desktop
-                    if (savedPetalsState === null || savedPetalsState === undefined) {
-                        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                        sakuraPetalsActive = !isMobile;
-                        localStorage.setItem('sakuraPetals', sakuraPetalsActive);
-
-                        const toggle = document.getElementById('sakuraPetalsToggle');
-                        const petalsIcon = document.getElementById('petals-icon');
-                        const petalsText = document.getElementById('petals-text');
-
-                        if (sakuraPetalsActive) {
-                            createSakuraPetals();
-                            toggle.classList.add('active');
-                            petalsIcon.textContent = '🌸✨';
-                        } else {
-                            petalsIcon.textContent = '🌸';
-                        }
-                        petalsText.textContent = 'Blütenblätter';
-                    }
-                }
-            }
-
-            function cycleTheme() {
-                const html = document.documentElement;
-                const currentTheme = html.getAttribute('data-theme') || 'light';
-                const currentIndex = themes.indexOf(currentTheme);
-                const nextIndex = (currentIndex + 1) % themes.length;
-                const nextTheme = themes[nextIndex];
-
-                changeTheme(nextTheme);
-            }
-
-            function toggleThemeDropdown() {
-                const dropdown = document.getElementById('themeDropdown');
-                const layoutDropdown = document.getElementById('layoutDropdown');
-
-                // Close layout dropdown if open
-                layoutDropdown.classList.remove('show');
-
-                dropdown.classList.toggle('show');
-            }
-
-            // Sakura Petals Animation System
-            let sakuraPetalsActive = false;
-            let sakuraPetalsContainer = null;
-
-            function createSakuraPetals() {
-                if (sakuraPetalsContainer) return; // Already exists
-
-                sakuraPetalsContainer = document.createElement('div');
-                sakuraPetalsContainer.id = 'sakuraPetalsContainer';
-                sakuraPetalsContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;';
-
-                // Create 6 petals
-                for (let i = 0; i < 6; i++) {
-                    const petal = document.createElement('div');
-                    petal.className = 'sakura-petal';
-                    sakuraPetalsContainer.appendChild(petal);
-                }
-
-                document.body.appendChild(sakuraPetalsContainer);
-            }
-
-            function removeSakuraPetals() {
-                if (sakuraPetalsContainer) {
-                    sakuraPetalsContainer.remove();
-                    sakuraPetalsContainer = null;
-                }
-            }
-
-            function toggleSakuraPetals() {
-                sakuraPetalsActive = !sakuraPetalsActive;
-                localStorage.setItem('sakuraPetals', sakuraPetalsActive);
-
-                const toggle = document.getElementById('sakuraPetalsToggle');
-                const icon = document.getElementById('petals-icon');
-                const text = document.getElementById('petals-text');
-
-                if (sakuraPetalsActive) {
-                    createSakuraPetals();
-                    toggle.classList.add('active');
-                    icon.textContent = '🌸✨';
-                    text.textContent = 'Blütenblätter';
-                } else {
-                    removeSakuraPetals();
-                    toggle.classList.remove('active');
-                    icon.textContent = '🌸';
-                    text.textContent = 'Blütenblätter';
-                }
-            }
-
-            function updateSakuraPetalsToggleVisibility() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const toggle = document.getElementById('sakuraPetalsToggle');
-                const isSakuraTheme = currentTheme === 'sakura-light' || currentTheme === 'sakura-dark';
-
-                if (isSakuraTheme) {
-                    toggle.classList.add('show');
-                } else {
-                    toggle.classList.remove('show');
-                    // Remove petals if switching away from Sakura theme
-                    if (sakuraPetalsActive) {
-                        removeSakuraPetals();
-                        sakuraPetalsActive = false;
-                        localStorage.setItem('sakuraPetals', false);
-                        toggle.classList.remove('active');
-                        document.getElementById('petals-icon').textContent = '🌸';
-                    }
-                }
-            }
-
-            // Toggle Dropdown (Layout)
-            function toggleDropdown() {
-                const dropdown = document.getElementById('layoutDropdown');
-                const themeDropdown = document.getElementById('themeDropdown');
-
-                // Close theme dropdown if open
-                themeDropdown.classList.remove('show');
-
-                dropdown.classList.toggle('show');
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                const layoutDropdown = document.getElementById('layoutDropdown');
-                const layoutToggle = document.querySelector('.layout-toggle-hybrid');
-                const themeDropdown = document.getElementById('themeDropdown');
-                const themeToggle = document.querySelector('.theme-toggle-hybrid');
-
-                if (!layoutToggle.contains(event.target)) {
-                    layoutDropdown.classList.remove('show');
-                }
-
-                if (!themeToggle.contains(event.target)) {
-                    themeDropdown.classList.remove('show');
-                }
-            });
-
-            // Cycle through layouts (for left click)
-            function cycleLayout() {
-                const articles = document.querySelector('.articles');
-                let currentLayout = 'grid';
-
-                if (articles.classList.contains('list-view')) {
-                    currentLayout = 'list';
-                } else if (articles.classList.contains('compact-view')) {
-                    currentLayout = 'compact';
-                }
-
-                let newLayout;
-                if (currentLayout === 'grid') {
-                    newLayout = 'list';
-                } else if (currentLayout === 'list') {
-                    newLayout = 'compact';
-                } else {
-                    newLayout = 'grid';
-                }
-
-                changeLayout(newLayout);
-            }
-
-            // Change Layout
-            function changeLayout(layout) {
-                const articles = document.querySelector('.articles');
-                const icon = document.getElementById('layout-icon');
-                const text = document.getElementById('layout-text');
-                const options = document.querySelectorAll('.layout-option-hybrid');
-
-                // Remove all classes
-                articles.classList.remove('list-view', 'compact-view');
-
-                // Add appropriate class and update UI
-                if (layout === 'list') {
-                    articles.classList.add('list-view');
-                    icon.textContent = '☰';
-                    text.textContent = 'Liste';
-                } else if (layout === 'compact') {
-                    articles.classList.add('compact-view');
-                    icon.textContent = '≡';
-                    text.textContent = 'Kompakt';
-                } else {
-                    icon.textContent = '▦';
-                    text.textContent = 'Grid';
-                }
-
-                // Update active state
-                options.forEach(opt => opt.classList.remove('active'));
-                const activeOption = Array.from(options).find(opt => {
-                    if (layout === 'grid' && opt.textContent.includes('Grid')) return true;
-                    if (layout === 'list' && opt.textContent.includes('Liste')) return true;
-                    if (layout === 'compact' && opt.textContent.includes('Kompakt')) return true;
-                });
-                if (activeOption) activeOption.classList.add('active');
-
-                // Save to localStorage
-                localStorage.setItem('layout', layout);
-
-                // Close dropdown
-                document.getElementById('layoutDropdown').classList.remove('show');
-            }
-
-            // Layout Toggle (Grid ↔ List ↔ Compact)
-            function toggleLayout() {
-                const articles = document.querySelector('.articles');
-                let currentLayout = 'grid';
-
-                if (articles.classList.contains('list-view')) {
-                    currentLayout = 'list';
-                } else if (articles.classList.contains('compact-view')) {
-                    currentLayout = 'compact';
-                }
-
-                // Cycle through layouts: grid → list → compact → grid
-                let newLayout;
-                if (currentLayout === 'grid') {
-                    newLayout = 'list';
-                    articles.classList.add('list-view');
-                    articles.classList.remove('compact-view');
-                } else if (currentLayout === 'list') {
-                    newLayout = 'compact';
-                    articles.classList.remove('list-view');
-                    articles.classList.add('compact-view');
-                } else {
-                    newLayout = 'grid';
-                    articles.classList.remove('list-view');
-                    articles.classList.remove('compact-view');
-                }
-
-                localStorage.setItem('layout', newLayout);
-
-                // Update button
-                const icon = document.getElementById('layout-icon');
-                const text = document.getElementById('layout-text');
-                if (newLayout === 'list') {
-                    icon.textContent = '☰';
-                    text.textContent = 'Liste';
-                } else if (newLayout === 'compact') {
-                    icon.textContent = '≡';
-                    text.textContent = 'Kompakt';
-                } else {
-                    icon.textContent = '▦';
-                    text.textContent = 'Grid';
-                }
-            }
-
-            // Scroll to Top
-            function scrollToTop() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
-
-            // Show/Hide Scroll to Top Button
-            window.addEventListener('scroll', function() {
-                const scrollTop = document.getElementById('scrollTop');
-                if (window.pageYOffset > 300) {
-                    scrollTop.classList.add('visible');
-                } else {
-                    scrollTop.classList.remove('visible');
-                }
-            });
-
-            // Favoriten-System
-            function toggleFavorite(articleId) {
-                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                const star = document.querySelector(`[data-article-id="${articleId}"]`);
-
-                const index = favorites.indexOf(articleId);
-                if (index > -1) {
-                    // Remove from favorites
-                    favorites.splice(index, 1);
-                    star.textContent = '☆';
-                    star.classList.remove('favorited');
-                } else {
-                    // Add to favorites
-                    favorites.push(articleId);
-                    star.textContent = '★';
-                    star.classList.add('favorited');
-                }
-
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-                updateFavoriteCount();
-            }
-
-            // Update Favoriten-Counter
-            function updateFavoriteCount() {
-                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                document.getElementById('favCount').textContent = favorites.length;
-            }
-
-            // Load Favoriten beim Laden
-            function loadFavorites() {
-                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                console.log('Loading favorites:', favorites);
-
-                favorites.forEach(id => {
-                    const star = document.querySelector(`[data-article-id="${id}"]`);
-                    if (star) {
-                        star.textContent = '★';
-                        star.classList.add('favorited');
-                    }
-                });
-
-                // Check if we're in favorites view
-                const urlParams = new URLSearchParams(window.location.search);
-                const isFavoritesView = urlParams.get('favorites') === '1';
-                console.log('Is favorites view?', isFavoritesView, 'URL params:', window.location.search);
-
-                if (isFavoritesView) {
-                    console.log('Loading favorites view with IDs:', favorites);
-                    loadFavoritesView(favorites);
-                }
-            }
-
-            // Load Favorites View - zeige nur gespeicherte Favoriten
-            async function loadFavoritesView(favoriteIds) {
-                console.log('loadFavoritesView called with:', favoriteIds);
-
-                if (favoriteIds.length === 0) {
-                    const articles = document.querySelector('.articles');
-                    articles.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Keine Favoriten gespeichert. Klicke auf ⭐ bei Artikeln um sie zu speichern!</p>';
-                    return;
-                }
-
-                try {
-                    const url = `get_favorites.php?ids=${favoriteIds.join(',')}`;
-                    console.log('Fetching:', url);
-
-                    const response = await fetch(url);
-                    const articles = await response.json();
-
-                    console.log('Got articles:', articles);
-
-                    // ⭐ NEU: Bereinige verwaiste Favoriten (IDs die nicht mehr in DB existieren)
-                    const validIds = articles.map(a => a.id);
-                    const orphanedIds = favoriteIds.filter(id => !validIds.includes(id));
-
-                    if (orphanedIds.length > 0) {
-                        console.log('Removing orphaned favorites:', orphanedIds);
-                        const cleanedFavorites = favoriteIds.filter(id => validIds.includes(id));
-                        localStorage.setItem('favorites', JSON.stringify(cleanedFavorites));
-                        document.getElementById('favCount').textContent = cleanedFavorites.length;
-                    }
-
-                    if (articles.length === 0) {
-                        const articlesDiv = document.querySelector('.articles');
-                        articlesDiv.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Keine Favoriten gefunden. Möglicherweise wurden die Artikel gelöscht.</p>';
-                        return;
-                    }
-
-                    displayFavorites(articles, favoriteIds);
-                } catch (error) {
-                    console.error('Error loading favorites:', error);
-                }
-            }
-
-            // Display Favorites
-            function displayFavorites(articles, favoriteIds) {
-                const articlesDiv = document.querySelector('.articles');
-                articlesDiv.innerHTML = '';
-
-                articles.forEach(article => {
-                    const card = createArticleCard(article, favoriteIds.includes(article.id));
-                    articlesDiv.appendChild(card);
-                });
-            }
-
-            // Create Article Card
-            function createArticleCard(article, isFavorite) {
-                const card = document.createElement('article');
-                card.className = 'article-card';
-                card.style.position = 'relative';
-
-                const date = new Date(article.pub_date);
-                const formattedDate = date.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric'}) + ' ' +
-                    date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
-
-                card.innerHTML = `
-                    ${article.image_url ? `
-                        <img src="${article.image_url}"
-                             alt="${article.title}"
-                             class="article-image"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="article-image no-image" style="display:none;">🎮</div>
-                    ` : `
-                        <div class="article-image no-image">🎮</div>
-                    `}
-
-                    <div class="article-content">
-                        <div class="article-meta">
-                            <span class="date">${formattedDate} Uhr</span>
-                            <span class="source">${article.source}</span>
-                            <span class="favorite-star ${isFavorite ? 'favorited' : ''}"
-                                  onclick="toggleFavorite(${article.id})"
-                                  data-article-id="${article.id}"
-                                  title="Zu Favoriten hinzufügen">
-                                ${isFavorite ? '★' : '☆'}
-                            </span>
-                        </div>
-
-                        <h2>
-                            <a href="${article.link}" target="_blank" rel="noopener noreferrer">
-                                ${article.title}
-                            </a>
-                        </h2>
-
-                        ${article.description ? `
-                            <p class="description">
-                                ${article.description.substring(0, 150)}${article.description.length > 150 ? '...' : ''}
-                            </p>
-                        ` : ''}
-
-                        ${article.tags ? `
-                            <div class="tags">
-                                ${article.tags.split(',').slice(0, 5).map(tag =>
-                    `<a href="?search=${encodeURIComponent(tag.trim())}" class="tag">${tag.trim()}</a>`
-                ).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-
-                return card;
-            }
-
-            // Load Favoriten beim Laden
-            // Auto-Refresh (alle 5 Minuten checken)
-            let lastArticleCount = <?php echo $totalArticles; ?>;
-
-            function checkForNewArticles() {
-                fetch('check_new_articles.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.count > lastArticleCount) {
-                            const diff = data.count - lastArticleCount;
-                            showRefreshNotification(`🎮 ${diff} neue Artikel verfügbar!`);
-                        }
-                    })
-                    .catch(error => console.log('Auto-refresh check failed:', error));
-            }
-
-            function showRefreshNotification(message) {
-                const notification = document.getElementById('refreshNotification');
-                const messageEl = document.getElementById('refreshMessage');
-                messageEl.textContent = message;
-                notification.classList.add('show');
-
-                // Auto-hide after 10 seconds
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 10000);
-            }
-
-            // Start auto-refresh check every 5 minutes
-            setInterval(checkForNewArticles, 5 * 60 * 1000);
-
-            // Load saved theme and layout
-            (function() {
-                console.log('=== IIFE started ===');
-
-                // Theme (4 Themes: Light, Dark, Sakura Light, Sakura Dark)
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-
-                const themeIcon = document.getElementById('theme-icon');
-                const themeText = document.getElementById('theme-text');
-                const themeConfig = {
-                    'light': { icon: '☀️', text: 'Light' },
-                    'dark': { icon: '🌙', text: 'Dark' },
-                    'sakura-light': { icon: '🌸', text: 'Sakura Light' },
-                    'sakura-dark': { icon: '🌸', text: 'Sakura Dark' }
-                };
-
-                const config = themeConfig[savedTheme] || themeConfig['light'];
-                themeIcon.textContent = config.icon;
-                themeText.textContent = config.text;
-
-                // Update active state in theme dropdown
-                document.querySelectorAll('.theme-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                const activeThemeOption = document.querySelector(`.theme-option[onclick*="${savedTheme}"]`);
-                if (activeThemeOption) {
-                    activeThemeOption.classList.add('active');
-                }
-
-                // Layout
-                const savedLayout = localStorage.getItem('layout') || 'grid';
-                const articles = document.querySelector('.articles');
-                const layoutIcon = document.getElementById('layout-icon');
-                const layoutText = document.getElementById('layout-text');
-
-                if (savedLayout === 'list') {
-                    articles.classList.add('list-view');
-                    layoutIcon.textContent = '☰';
-                    layoutText.textContent = 'Liste';
-                } else if (savedLayout === 'compact') {
-                    articles.classList.add('compact-view');
-                    layoutIcon.textContent = '≡';
-                    layoutText.textContent = 'Kompakt';
-                } else {
-                    layoutIcon.textContent = '▦';
-                    layoutText.textContent = 'Grid';
-                }
-
-                // Load Favoriten
-                loadFavorites();
-                updateFavoriteCount();
-
-                // Sakura Petals Initialisierung
-                updateSakuraPetalsToggleVisibility();
-
-                // Detect if mobile
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-                // Load saved petals state or use default (ON for desktop, OFF for mobile)
-                const savedPetalsState = localStorage.getItem('sakuraPetals');
-                const isSakuraTheme = savedTheme === 'sakura-light' || savedTheme === 'sakura-dark';
-
-                console.log('🌸 Init Petals - isMobile:', isMobile, 'savedState:', savedPetalsState, 'isSakuraTheme:', isSakuraTheme);
-
-                if (isSakuraTheme) {
-                    const toggle = document.getElementById('sakuraPetalsToggle');
-                    const icon = document.getElementById('petals-icon');
-                    const text = document.getElementById('petals-text');
-
-                    // If no saved state exists, use default based on device
-                    if (savedPetalsState === null || savedPetalsState === undefined) {
-                        sakuraPetalsActive = !isMobile; // ON for desktop, OFF for mobile
-                        localStorage.setItem('sakuraPetals', sakuraPetalsActive);
-                        console.log('🌸 No saved state - setting default:', sakuraPetalsActive);
-                    } else {
-                        sakuraPetalsActive = savedPetalsState === 'true';
-                        console.log('🌸 Using saved state:', sakuraPetalsActive);
-                    }
-
-                    // Apply the state
-                    if (sakuraPetalsActive) {
-                        console.log('🌸 Creating petals...');
-                        createSakuraPetals();
-                        toggle.classList.add('active');
-                        icon.textContent = '🌸✨';
-                    } else {
-                        console.log('🌸 Petals disabled');
-                        icon.textContent = '🌸';
-                    }
-
-                    // Text bleibt immer gleich
-                    text.textContent = 'Blütenblätter';
-                }
-            })();
-
-            // AJAX Feed Update (kein Redirect!)
-            function updateFeeds() {
-                const btn = document.getElementById('update-btn');
-                const status = document.getElementById('update-status');
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Lade Feeds...';
-                status.innerHTML = '<p style="color: var(--text-secondary);">Bitte warten, Feeds werden aktualisiert...</p>';
-
-                // Erstelle ein unsichtbares iframe für fetch_feeds.php
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = 'fetch_feeds.php';
-                document.body.appendChild(iframe);
-
-                // Nach 5 Sekunden: Seite neu laden
-                setTimeout(() => {
-                    status.innerHTML = '<p style="color: green;">✅ Feeds aktualisiert! Seite wird neu geladen...</p>';
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }, 5000);
-            }
+            // Diese Variable wird von PHP gesetzt
+            window.initialArticleCount = <?php echo $totalArticles; ?>;
         </script>
+        <script src="./js/script.js"></script>
     </body>
     </html>
 <?php $conn->close(); ?>
