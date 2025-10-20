@@ -101,11 +101,30 @@ try {
 // Liste der RSS-Feeds
 $feeds = [
     ['url' => 'https://www.play3.de/feed/rss/', 'name' => 'Play3.de'],
-    ['url' => 'https://www.gamestar.de/rss/gaming.rss', 'name' => 'GameStar Gaming News'],
-    ['url' => 'https://www.gamestar.de/news/rss/news.rss', 'name' => 'GameStar News'],
-    ['url' => 'https://www.buffed.de/feed.cfm', 'name' => 'Buffed'],
-    ['url' => 'https://www.gamers.de/rss/', 'name' => 'gamers'],
-    ['url' => 'https://www.xboxdynasty.de/cip_xd.rss.xml', 'name' => 'xboxdynasty'],
+    ['url' => 'https://www.gamestar.de/rss/gamestar.rss', 'name' => 'gamestar.de'],
+    ['url' => 'https://www.buffed.de/feed.cfm', 'name' => 'buffed.de'],
+    ['url' => 'https://www.gamers.de/rss/', 'name' => 'gamers.de'],
+    ['url' => 'https://www.xboxdynasty.de/cip_xd.rss.xml', 'name' => 'xboxdynasty.de'],
+    ['url' => 'https://www.playstationinfo.de/feed/', 'name' => 'playstationinfo.de'],
+    ['url' => 'https://www.xboxuser.de/rssfeeds', 'name' => 'xboxuser.de'],
+    ['url' => 'https://www.videogameszone.de/feed.cfm', 'name' => 'videogameszone.de'],
+    ['url' => 'https://www.computerbild.de/rssfeed_2261.html?node=12', 'name' => 'computerbild.de'],
+    ['url' => 'https://www.4p.de/feed', 'name' => '4p.de'],
+    ['url' => 'https://www.gameswirtschaft.de/feed/', 'name' => 'gameswirtschaft.de'],
+    ['url' => 'https://www.gamepro.de/rss/gamepro.rss', 'name' => 'gamepro.de'],
+    ['url' => 'https://www.gamezone.de/feed.cfm?menu_alias=home/', 'name' => 'gamezone.de'],
+    ['url' => 'https://playfront.de/feed/', 'name' => 'playfront.de'],
+    ['url' => 'https://www.gamersglobal.de/feeds/all', 'name' => 'gamersglobal.de'],
+    ['url' => 'https://mein-mmo.de/feed/', 'name' => 'mein-mmo.de'],
+    ['url' => 'https://www.eurogamer.de/feed', 'name' => 'eurogamer.de'],
+    ['url' => 'https://www.pcgames.de/feed.cfm?menu_alias=home', 'name' => 'pcgames.de'],
+    ['url' => 'https://www.pcgameshardware.de/feed.cfm?menu_alias=home', 'name' => 'pcgameshardware.de'],
+    ['url' => 'https://de.ign.com/feed.xml', 'name' => 'de.ign.com'],
+    ['url' => 'https://www.gamesradar.com/feeds.xml', 'name' => 'gamesradar.com'],
+    ['url' => 'https://pixelcritics.com/feed', 'name' => 'pixelcritics.com'],
+    ['url' => 'https://www.gamespot.com/feeds/mashup', 'name' => 'gamespot.com'],
+    ['url' => 'https://www.gameswelt.ch/feeds/artikel/rss.xml', 'name' => 'gameswelt.ch'],
+    ['url' => 'https://jpgames.de/feed/', 'name' => 'jpgames.de'],
 ];
 
 $conn = getDB();
@@ -220,7 +239,7 @@ foreach ($feeds as $feedData) {
             }
 
             // Methode 5: Für Feeds ohne Bilder (play3.de, xboxdynasty) -> Open Graph Image scrapen
-            if (!$imageUrl && in_array($sourceName, ['Play3.de', 'xboxdynasty'])) {
+            if (!$imageUrl && in_array($sourceName, ['Play3.de', 'xboxdynasty.de', 'playfront.de', 'playstationinfo.de', 'pixelcritics.com', 'gameswelt.ch', 'jpgames.de'])) {
                 echo "<small style='color: #999;'>⏳ Hole Bild von Webseite...</small><br>";
                 $imageUrl = getOgImageFromUrl($link);
                 if ($imageUrl) {

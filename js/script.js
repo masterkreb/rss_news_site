@@ -1,3 +1,30 @@
+// === FAVORITEN DEBUG ===
+console.time('⏱️ Zeit bis Favoriten gefiltert');
+
+const favObserver = new MutationObserver(() => {
+    const articles = document.querySelectorAll('.article-card');
+    const hiddenCount = Array.from(articles).filter(a => a.style.display === 'none').length;
+
+    if (hiddenCount > 0) {
+        console.timeEnd('⏱️ Zeit bis Favoriten gefiltert');
+        console.log('📊 Artikel versteckt:', hiddenCount, 'von', articles.length);
+        favObserver.disconnect();
+    }
+});
+
+// Beobachte ob Artikel versteckt werden
+document.addEventListener('DOMContentLoaded', () => {
+    const articlesContainer = document.querySelector('.articles');
+    if (articlesContainer) {
+        favObserver.observe(articlesContainer, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    }
+});
+
 console.log('=== Script started ===');
 
 // Theme System (4 Themes: Light, Dark, Sakura Light, Sakura Dark)
@@ -13,6 +40,7 @@ function changeTheme(theme) {
     const html = document.documentElement;
     html.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
+    document.cookie = `theme=${theme}; path=/; max-age=31536000`;
 
     // Update button
     const icon = document.getElementById('theme-icon');
@@ -114,6 +142,7 @@ function removeSakuraPetals() {
 function toggleSakuraPetals() {
     sakuraPetalsActive = !sakuraPetalsActive;
     localStorage.setItem('sakuraPetals', sakuraPetalsActive);
+    document.cookie = `sakuraPetals=${sakuraPetalsActive}; path=/; max-age=31536000`; // NEU
 
     const toggle = document.getElementById('sakuraPetalsToggle');
 
@@ -230,6 +259,7 @@ function changeLayout(layout) {
 
     // Save to localStorage
     localStorage.setItem('layout', layout);
+    document.cookie = `layout=${layout}; path=/; max-age=31536000`; // NEU: Cookie setzen
 
     // Close dropdown
     document.getElementById('layoutDropdown').classList.remove('show');
@@ -316,6 +346,7 @@ function toggleFavorite(articleId) {
     }
 
     localStorage.setItem('favorites', JSON.stringify(favorites));
+    document.cookie = `favorites=${JSON.stringify(favorites)}; path=/; max-age=31536000`; // Cookie setzen
     updateFavoriteCount();
 }
 
@@ -603,3 +634,35 @@ function updateFeeds() {
         }, 1000);
     }, 5000);
 }
+
+// Filter Dropdown Toggle
+function toggleFilterDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const group = dropdown.parentElement;
+
+    // Schließe alle anderen Dropdowns
+    document.querySelectorAll('.filter-toggle-group').forEach(g => {
+        if (g !== group) {
+            g.classList.remove('show');
+        }
+    });
+
+    // Toggle aktuelles Dropdown
+    group.classList.toggle('show');
+}
+
+// Schließe Dropdowns beim Klick außerhalb
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.filter-toggle-group')) {
+        document.querySelectorAll('.filter-toggle-group').forEach(g => {
+            g.classList.remove('show');
+        });
+    }
+});
+
+// Verhindere dass Dropdown sich beim Klick auf Toggle schließt
+document.querySelectorAll('.filter-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+});
